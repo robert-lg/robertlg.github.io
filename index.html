@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Reportes - ADSL SYSTEM</title>
+<style>
+    :root {
+        --color-principal: #667eea;
+        --color-secundario: #764ba2;
+        --color-fondo: #f8f9fa;
+        --color-texto: #333;
+        --radius: 8px;
+        --sombra: 0 6px 24px rgba(0,0,0,0.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
+        padding: 20px;
+        color: var(--color-texto);
+        min-height: 100vh;
+        margin: 0;
+    }
+    .container {
+        background: #fff;
+        border-radius: var(--radius);
+        box-shadow: var(--sombra);
+        max-width: 1200px;
+        margin: auto;
+        overflow: hidden;
+        animation: fadeIn 0.4s ease-in-out;
+        margin-bottom: 40px;
+    }
+    @keyframes fadeIn { from {opacity:0; transform: translateY(10px);} to {opacity:1; transform:none;} }
+    
+    /* LOGIN STYLES */
+    .login-container {
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 40px;
+        text-align: center;
+    }
+    .login-container h1 {
+        color: var(--color-principal);
+        margin-bottom: 10px;
+        font-size: 28px;
+    }
+    .login-container .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 14px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: var(--color-texto);
+        font-size: 13px;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: var(--radius);
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .form-group input:focus {
+        border-color: var(--color-principal);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    .error-msg {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 10px;
+        display: none;
+    }
+    
+    /* NAVBAR */
+    .navbar {
+        background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
+        color: white;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .navbar-brand {
+        font-size: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .nav-menu {
+        display: flex;
+        gap: 5px;
+    }
+    .nav-item {
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .nav-item:hover, .nav-item.active {
+        background: rgba(255,255,255,0.2);
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 14px;
+    }
+    .btn-logout {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 15px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.3s;
+    }
+    .btn-logout:hover {
+        background: rgba(255,255,255,0.3);
+    }
+    
+    /* DASHBOARD STYLES */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 30px;
+    }
+    .dashboard-card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        border-left: 4px solid var(--color-principal);
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .dashboard-card h3 {
+        color: var(--color-principal);
+        margin: 0 0 10px 0;
+        font-size: 18px;
+    }
+    .dashboard-card p {
+        color: #666;
+        font-size: 14px;
+        margin: 0;
+    }
+    .dashboard-card .icon {
+        font-size: 40px;
+        margin-bottom: 15px;
+        opacity: 0.8;
+    }
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        padding: 20px 30px;
+        background: var(--color-fondo);
+    }
+    .stat-box {
+        background: white;
+        padding: 20px;
+        border-radius: var(--radius);
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: var(--color-principal);
+        margin-bottom: 5px;
+    }
+    .stat-label {
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* ORIGINAL STYLES */
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        padding: 20px;
+        background: var(--color-fondo);
+    }
+    .card {
+        background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
+        color: #fff;
+        border-radius: var(--radius);
+        text-align: center;
+        padding: 20px;
+    }
+    .card-label { font-size: 12px; opacity: .9; margin-bottom: 5px; }
+    .card-value { font-size: 26px; font-weight: bold; }
+    .section-title {
+        background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
+        color: #fff;
+        padding: 10px 20px;
+        text-transform: uppercase;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: .5px;
+    }
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 20px;
+        background: var(--color-fondo);
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .filter-bar input, .filter-bar select {
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 13px;
+        min-width: 200px;
+        transition: all .2s;
+    }
+    .filter-bar input:focus, .filter-bar select:focus {
+        border-color: var(--color-principal);
+        box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
+        outline: none;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead {
+        background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
+        color: white;
+    }
+    th, td {
+        padding: 10px 12px;
+        text-align: center;
+        font-size: 13px;
+    }
+    tbody tr:hover { background: #f3f4ff; }
+    .btn-delete { background: #dc3545; border: none; border-radius: 4px; font-size: 11px; padding: 4px 8px; color: white; cursor: pointer; }
+    input[type="text"], input[type="number"], select.cuadrilla-select {
+        width: 100%;
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+        text-align: center;
+    }
+    .btn-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        padding: 20px;
+        background: var(--color-fondo);
+    }
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 25px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform .2s, box-shadow .2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-success { background: #28a745; }
+    .btn-primary { background: var(--color-principal); }
+    .btn-pdf { background: #d32f2f; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .month-selector {
+        background: white;
+        padding: 15px 20px;
+        border-bottom: 2px solid var(--color-principal);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+    .month-selector select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+    }
+    
+    .hidden { display: none !important; }
+    
+    @media print { 
+        .no-print, .btn-container, .filter-bar, .month-selector, .navbar { display: none !important; } 
+        body, .container { background: white; box-shadow: none; padding: 0; } 
+    }
+</style>
+</head>
+<body>
+
+<!-- SECCIÓN LOGIN -->
+<div id="loginSection" class="container login-container">
+    <h1>🔐 ADSL SYSTEM</h1>
+    <div class="subtitle">Sistema de Reportes de Instalaciones</div>
+    <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" id="username" placeholder="Ingrese su usuario" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="password" placeholder="Ingrese su contraseña" required>
+        </div>
+        <button type="submit" class="btn-login">Iniciar Sesión</button>
+        <div id="loginError" class="error-msg">Usuario o contraseña incorrectos</div>
+    </form>
+    <div style="margin-top: 20px; font-size: 12px; color: #999;">
+        <p>Usuarios demo:</p>
+        <p><strong>admin</strong> / admin (Administrador)</p>
+        <p><strong>user</strong> / user (Usuario)</p>
+    </div>
+</div>
+
+<!-- NAVBAR (visible solo cuando está logueado) -->
+<div id="navbar" class="navbar hidden">
+    <div class="navbar-brand">
+        📊 ADSL SYSTEM
+    </div>
+    <div class="nav-menu">
+        <div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
+        <div class="nav-item" onclick="showSection('reportes')">Reportes</div>
+        <div class="nav-item" onclick="showSection('config')">Configuración</div>
+    </div>
+    <div class="user-info">
+        <span id="currentUser">Usuario</span>
+        <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardSection" class="container hidden">
+    <div class="section-title">Panel de Control</div>
+    <div class="stats-row">
+        <div class="stat-box">
+            <div class="stat-value" id="dashTotalInst">0</div>
+            <div class="stat-label">Total Instalaciones</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" id="dashTotalMonto">$0</div>
+            <div class="stat-label">Monto Total</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" id="dashTotalCuadrillas">0</div>
+            <div class="stat-label">Cuadrillas Activas</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" id="dashTotalInfra">0</div>
+            <div class="stat-label">Infraestructuras</div>
+        </div>
+    </div>
+    <div class="dashboard-grid">
+        <div class="dashboard-card" onclick="showSection('reportes')">
+            <div class="icon">📋</div>
+            <h3>Reportes Mensuales</h3>
+            <p>Gestione los reportes de instalaciones e infraestructura por cuadrilla</p>
+        </div>
+        <div class="dashboard-card" onclick="showSection('config')">
+            <div class="icon">⚙️</div>
+            <h3>Configuración</h3>
+            <p>Administre cuadrillas, usuarios y preferencias del sistema</p>
+        </div>
+        <div class="dashboard-card" onclick="exportToPDFUnificado()">
+            <div class="icon">📄</div>
+            <h3>Exportar PDF</h3>
+            <p>Genere reportes en PDF de todos los datos del mes actual</p>
+        </div>
+    </div>
+</div>
+
+<!-- SECCIÓN CONFIGURACIÓN -->
+<div id="configSection" class="container hidden">
+    <div class="section-title">Configuración del Sistema</div>
+    <div style="padding: 30px;">
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: var(--color-principal); margin-bottom: 15px;">💾 Gestión de Datos</h3>
+            <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                Los datos se guardan automáticamente en el navegador. 
+                Para implementar base de datos real, conecte el backend en las funciones marcadas con TODO.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="guardarConfiguracionManual()">💾 Guardar Configuración</button>
+                <button class="btn btn-success" onclick="cargarConfiguracion()">📂 Cargar Última Configuración</button>
+                <button class="btn btn-delete" onclick="resetDatos()">🗑️ Resetear Datos</button>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: var(--color-principal); margin-bottom: 15px;">👥 Gestión de Usuarios</h3>
+            <div id="userManagement" style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <p style="font-size: 14px; color: #666;">Función disponible solo para administradores</p>
+            </div>
+        </div>
+        
+        <div>
+            <h3 style="color: var(--color-principal); margin-bottom: 15px;">🏢 Información de la Empresa</h3>
+            <div class="form-group" style="max-width: 400px;">
+                <label>Nombre de la Empresa</label>
+                <input type="text" id="configEmpresa" value="ADSL SYSTEM" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+            <div class="form-group" style="max-width: 400px;">
+                <label>Coordinador</label>
+                <input type="text" id="configCoordinador" value="Robert Lugo" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECCIÓN REPORTES (ORIGINAL) -->
+<div id="reportesSection" class="hidden">
+    <!-- SELECTOR DE MES -->
+    <div class="container">
+        <div class="month-selector no-print">
+            <label for="mesReporte">📅 Mes del Reporte:</label>
+            <select id="mesReporte">
+                <option value="Enero">Enero</option>
+                <option value="Febrero">Febrero</option>
+                <option value="Marzo">Marzo</option>
+                <option value="Abril">Abril</option>
+                <option value="Mayo">Mayo</option>
+                <option value="Junio">Junio</option>
+                <option value="Julio">Julio</option>
+                <option value="Agosto">Agosto</option>
+                <option value="Septiembre">Septiembre</option>
+                <option value="Octubre">Octubre</option>
+                <option value="Noviembre">Noviembre</option>
+                <option value="Diciembre">Diciembre</option>
+            </select>
+            <input type="number" id="anioReporte" value="2026" min="2020" max="2099" style="width: 80px; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+            <button class="btn btn-primary" onclick="guardarConfiguracionManual()" style="margin-left: auto;">💾 Guardar Mes</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN TÉCNICOS -->
+    <div class="container" id="seccionTecnicos">
+        <div class="summary-cards">
+            <div class="card"><div class="card-label">Total Instalaciones</div><div class="card-value" id="totalInstalacionesTec">0</div></div>
+            <div class="card"><div class="card-label">Monto Total</div><div class="card-value" id="montoTotalTec">$0</div></div>
+            <div class="card"><div class="card-label">Soporte CUADRILLA</div><div class="card-value" id="soporteTotalTec">$0</div></div>
+        </div>
+
+        <div class="section-title">Resumen por CUADRILLA</div>
+        <div class="filter-bar no-print">
+            <input type="text" id="buscarTecnico" placeholder="Buscar técnico..." oninput="filtrarTabla('tecnico')">
+            <select id="filtroTecnico" onchange="filtrarTabla('tecnico')">
+                <option value="todos">Todos los técnicos</option>
+            </select>
+        </div>
+
+        <table>
+            <thead><tr><th>CUADRILLA</th><th>N° Instalaciones</th><th>Monto Total</th><th>Soporte</th><th class="no-print">Acciones</th></tr></thead>
+            <tbody id="bodyTecnicos"></tbody>
+        </table>
+
+        <div class="btn-container no-print">
+            <button class="btn btn-success" onclick="agregarFila('tecnico')">➕ CUADRILLA</button>
+            <button class="btn btn-primary" onclick="calcularTotales('tecnico')">🔄 Recalcular</button>
+            <button class="btn btn-pdf" onclick="exportToPDFUnificado()">🧾 PDF Completo</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN INFRAESTRUCTURA -->
+    <div class="container" id="seccionInfra">
+        <div class="summary-cards">
+            <div class="card"><div class="card-label">Total Infraestructuras</div><div class="card-value" id="totalInstalacionesInfra">0</div></div>
+            <div class="card"><div class="card-label">Monto Total</div><div class="card-value" id="montoTotalInfra">$0</div></div>
+        </div>
+
+        <div class="section-title">Resumen de Infraestructura</div>
+        <div class="filter-bar no-print">
+            <input type="text" id="buscarInfra" placeholder="Buscar infraestructura..." oninput="filtrarTabla('infra')">
+            <select id="filtroInfra" onchange="filtrarTabla('infra')">
+                <option value="todos">Todas</option>
+            </select>
+        </div>
+
+        <table>
+            <thead><tr><th>Cuadrilla</th><th>Infraestructura</th><th>Valor de Infraestructura</th><th>Monto Total</th><th class="no-print">Acciones</th></tr></thead>
+            <tbody id="bodyInfra"></tbody>
+        </table>
+
+        <div class="btn-container no-print">
+            <button class="btn btn-success" onclick="agregarFila('infra')">➕ Infraestructura</button>
+            <button class="btn btn-primary" onclick="calcularTotales('infra')">🔄 Recalcular</button>
+            <button class="btn btn-pdf" onclick="exportToPDFUnificado()">🧾 PDF Completo</button>
+        </div>
+        <label><center>Diseño y programación:<i>Robert Lugo Coordinador de Soporte de ADSL SYSTEM<i><center></label>
+    </div>
+</div>
+
+<!-- LIBRERÍAS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+// SISTEMA DE AUTENTICACIÓN
+const usuarios = [
+    { username: 'robertlg', password: 'sys*1000', role: 'admin', name: 'Administrador' },
+   
+];
+
+let currentUser = null;
+let datos = {
+    tecnico: [
+        {nombre:'AGUASAY', instalaciones:0},
+        {nombre:'TEMBLADOR', instalaciones:0},
+        {nombre:'CARIPE', instalaciones:0},
+        {nombre:'MATURÍN', instalaciones:0},
+    ],
+    infra: [
+        {cuadrilla:'AGUASAY', nombre:'CENTRAL PRINCIPAL', valor:0},
+        {cuadrilla:'TEMBLADOR', nombre:'TORRE SUR', valor:0},
+        {cuadrilla:'CARIPE', nombre:'FIBRA TRONCAL', valor:0},
+    ]
+};
+
+// Verificar sesión al cargar
+window.onload = function() {
+    const savedSession = localStorage.getItem('adsl_session');
+    if (savedSession) {
+        currentUser = JSON.parse(savedSession);
+        showMainApp();
+    } else {
+        document.getElementById('loginSection').classList.remove('hidden');
+        document.getElementById('navbar').classList.add('hidden');
+        document.getElementById('dashboardSection').classList.add('hidden');
+        document.getElementById('reportesSection').classList.add('hidden');
+        document.getElementById('configSection').classList.add('hidden');
+    }
+    const mesActual = new Date().getMonth();
+    document.getElementById('mesReporte').selectedIndex = mesActual;
+    cargarConfiguracion();
+};
+
+function handleLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    const user = usuarios.find(u => u.username === username && u.password === password);
+    
+    if (user) {
+        currentUser = user;
+        localStorage.setItem('adsl_session', JSON.stringify(user));
+        showMainApp();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('loginError').style.display = 'none';
+        }, 3000);
+    }
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('adsl_session');
+    location.reload();
+}
+
+function showMainApp() {
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('navbar').classList.remove('hidden');
+    document.getElementById('currentUser').textContent = currentUser.name;
+    showSection('dashboard');
+    updateDashboard();
+}
+
+function showSection(section) {
+    document.getElementById('dashboardSection').classList.add('hidden');
+    document.getElementById('reportesSection').classList.add('hidden');
+    document.getElementById('configSection').classList.add('hidden');
+    
+    if (section === 'dashboard') {
+        document.getElementById('dashboardSection').classList.remove('hidden');
+    } else if (section === 'reportes') {
+        document.getElementById('reportesSection').classList.remove('hidden');
+        renderizarTabla('tecnico');
+        renderizarTabla('infra');
+    } else if (section === 'config') {
+        document.getElementById('configSection').classList.remove('hidden');
+    }
+    
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+// DASHBOARD FUNCTIONS
+function updateDashboard() {
+    const totalInst = datos.tecnico.reduce((a, b) => a + b.instalaciones, 0);
+    const totalMonto = datos.tecnico.reduce((a, b) => a + b.instalaciones * 9, 0) + 
+                       datos.infra.reduce((a, b) => a + b.valor * 10, 0);
+    
+    document.getElementById('dashTotalInst').textContent = totalInst;
+    document.getElementById('dashTotalMonto').textContent = '$' + totalMonto.toFixed(0);
+    document.getElementById('dashTotalCuadrillas').textContent = datos.tecnico.length;
+    document.getElementById('dashTotalInfra').textContent = datos.infra.length;
+}
+
+// BASE DE DATOS - SILENCIOSA (sin alertas)
+function guardarConfiguracionSilenciosa() {
+    const config = {
+        datos: datos,
+        mes: document.getElementById('mesReporte').value,
+        anio: document.getElementById('anioReporte').value,
+        empresa: document.getElementById('configEmpresa').value,
+        coordinador: document.getElementById('configCoordinador').value,
+        fecha: new Date().toISOString()
+    };
+    
+    localStorage.setItem('adsl_config', JSON.stringify(config));
+    // Sin alert - guardado silencioso
+}
+
+function guardarConfiguracionManual() {
+    guardarConfiguracionSilenciosa();
+    alert('Configuración guardada exitosamente');
+}
+
+function cargarConfiguracion() {
+    const saved = localStorage.getItem('adsl_config');
+    if (saved) {
+        const config = JSON.parse(saved);
+        datos = config.datos || datos;
+        if (config.mes) document.getElementById('mesReporte').value = config.mes;
+        if (config.anio) document.getElementById('anioReporte').value = config.anio;
+        if (config.empresa) document.getElementById('configEmpresa').value = config.empresa;
+        if (config.coordinador) document.getElementById('configCoordinador').value = config.coordinador;
+        
+        renderizarTabla('tecnico');
+        renderizarTabla('infra');
+        updateDashboard();
+    }
+}
+
+function resetDatos() {
+    if (confirm('¿Está seguro de resetear todos los datos?')) {
+        datos = {
+            tecnico: [{nombre:'AGUASAY', instalaciones:0}],
+            infra: []
+        };
+        guardarConfiguracionSilenciosa();
+        renderizarTabla('tecnico');
+        renderizarTabla('infra');
+        updateDashboard();
+    }
+}
+
+// FUNCIONES ORIGINALES
+function obtenerCuadrillas() {
+    return datos.tecnico.map(t => t.nombre);
+}
+
+function filtrarTabla(tipo){
+    const texto=document.getElementById(`buscar${tipo==='tecnico'?'Tecnico':'Infra'}`).value.toLowerCase();
+    const filtro=document.getElementById(`filtro${tipo==='tecnico'?'Tecnico':'Infra'}`).value;
+    const arr=datos[tipo].filter(d=>{
+        const campo=(tipo==='tecnico'?d.nombre:d.cuadrilla||d.nombre).toLowerCase();
+        return (filtro==='todos'||(tipo==='tecnico'?d.nombre===filtro:d.cuadrilla===filtro))&&campo.includes(texto);
+    });
+    renderizarTabla(tipo,arr);
+}
+
+function renderizarTabla(tipo,arr=datos[tipo]){
+    const tbody=document.getElementById(`body${tipo==='tecnico'?'Tecnicos':'Infra'}`);
+    tbody.innerHTML="";
+    arr.forEach((d,i)=>{
+        if(tipo==='tecnico'){
+            const monto=d.instalaciones*9;
+            const soporte=d.instalaciones;
+            tbody.insertAdjacentHTML("beforeend",`
+            <tr>
+                <td><input type="text" value="${d.nombre}" onchange="actualizarDato('${tipo}',${i},'nombre',this.value)"></td>
+                <td><input type="number" value="${d.instalaciones}" onchange="actualizarDato('${tipo}',${i},'instalaciones',this.value)"></td>
+                <td>$${monto.toFixed(2)}</td>
+                <td>$${soporte.toFixed(2)}</td>
+                <td class="no-print"><button class="btn-delete" onclick="eliminarFila('${tipo}',${i})">🗑️</button></td>
+            </tr>`);
+        } else {
+            const monto=d.valor*10;
+            const cuadrillas = obtenerCuadrillas();
+            const opciones = cuadrillas.map(c => `<option value="${c}" ${c===d.cuadrilla?'selected':''}>${c}</option>`).join('');
+            tbody.insertAdjacentHTML("beforeend",`
+            <tr>
+                <td><select class="cuadrilla-select" onchange="actualizarDato('${tipo}',${i},'cuadrilla',this.value)">${opciones}</select></td>
+                <td><input type="text" value="${d.nombre}" onchange="actualizarDato('${tipo}',${i},'nombre',this.value)"></td>
+                <td><input type="number" value="${d.valor}" onchange="actualizarDato('${tipo}',${i},'valor',this.value)"></td>
+                <td>$${monto.toFixed(2)}</td>
+                <td class="no-print"><button class="btn-delete" onclick="eliminarFila('${tipo}',${i})">🗑️</button></td>
+            </tr>`);
+        }
+    });
+    actualizarSelectFiltro(tipo);
+    calcularTotales(tipo);
+}
+
+function actualizarSelectFiltro(tipo){
+    const select=document.getElementById(`filtro${tipo==='tecnico'?'Tecnico':'Infra'}`);
+    if(tipo==='tecnico'){
+        select.innerHTML='<option value="todos">Todos</option>';
+        datos[tipo].forEach(d=>{
+            select.insertAdjacentHTML("beforeend",`<option value="${d.nombre}">${d.nombre}</option>`);
+        });
+    } else {
+        select.innerHTML='<option value="todos">Todas</option>';
+        const cuadrillas = [...new Set(datos[tipo].map(d => d.cuadrilla))];
+        cuadrillas.forEach(c=>{
+            if(c) select.insertAdjacentHTML("beforeend",`<option value="${c}">${c}</option>`);
+        });
+    }
+}
+
+function actualizarDato(tipo,i,campo,valor){
+    if(tipo==='tecnico') {
+        datos[tipo][i][campo]=campo==='nombre'?valor:parseFloat(valor)||0;
+        renderizarTabla('infra');
+    } else {
+        datos[tipo][i][campo]=campo==='valor'?parseFloat(valor)||0:valor;
+    }
+    renderizarTabla(tipo);
+    guardarConfiguracionSilenciosa(); // Silencioso - sin alert
+}
+
+function eliminarFila(tipo,i){
+    if(confirm("¿Eliminar registro?")){
+        datos[tipo].splice(i,1);
+        renderizarTabla(tipo);
+        guardarConfiguracionSilenciosa(); // Silencioso - sin alert
+    }
+}
+
+function agregarFila(tipo){
+    if(tipo==='tecnico') {
+        datos[tipo].push({nombre:"Nuevo", instalaciones:0});
+    } else {
+        const cuadrillas = obtenerCuadrillas();
+        datos[tipo].push({cuadrilla:cuadrillas[0]||"", nombre:"Nueva Infraestructura", valor:0});
+    }
+    renderizarTabla(tipo);
+    guardarConfiguracionSilenciosa(); // Silencioso - sin alert
+}
+
+function calcularTotales(tipo){
+    const arr=datos[tipo];
+    if(tipo==='tecnico'){
+        const tInst=arr.reduce((a,b)=>a+b.instalaciones,0);
+        const tMonto=arr.reduce((a,b)=>a+b.instalaciones*9,0);
+        const tSop=arr.reduce((a,b)=>a+b.instalaciones,0);
+        document.getElementById("totalInstalacionesTec").textContent=tInst;
+        document.getElementById("montoTotalTec").textContent="$"+tMonto.toFixed(2);
+        document.getElementById("soporteTotalTec").textContent="$"+tSop.toFixed(2);
+    } else {
+        const tValor=arr.reduce((a,b)=>a+b.valor,0);
+        const tMonto=arr.reduce((a,b)=>a+b.valor*10,0);
+        document.getElementById("totalInstalacionesInfra").textContent=tValor;
+        document.getElementById("montoTotalInfra").textContent="$"+tMonto.toFixed(2);
+    }
+}
+
+function exportToPDFUnificado(){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    const mesSeleccionado = document.getElementById('mesReporte').value;
+    const anioSeleccionado = document.getElementById('anioReporte').value;
+    const empresa = document.getElementById('configEmpresa').value || 'ADSL SYSTEM';
+    const coordinador = document.getElementById('configCoordinador').value || 'Robert Lugo';
+    
+    function agregarPieDePagina(doc, pageNumber) {
+        const pageHeight = doc.internal.pageSize.height;
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Creado por: ${coordinador} - ${empresa}`, 7, pageHeight - 7);
+        doc.text(`Página ${pageNumber}`, doc.internal.pageSize.width - 30, pageHeight - 7);
+    }
+    
+    let pageNumber = 1;
+    
+    doc.setFontSize(16);
+    doc.setTextColor(102, 126, 234);
+    doc.text("Reporte de Instalaciones e Infraestructura", 14, 20);
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Mes: ${mesSeleccionado} ${anioSeleccionado}`, 14, 28);
+    doc.text(`Fecha de generación: ${new Date().toLocaleDateString()}`, 14, 34);
+
+    let yPos = 45;
+
+    doc.setFontSize(13);
+    doc.setTextColor(102, 126, 234);
+    doc.text("1. RESUMEN POR CUADRILLA", 14, yPos);
+    doc.setTextColor(0, 0, 0);
+    yPos += 8;
+
+    const arrTecnico = datos.tecnico;
+    const tablaTecnico = arrTecnico.map(d => [
+        d.nombre,
+        d.instalaciones,
+        "$" + (d.instalaciones * 9).toFixed(2),
+        "$" + (d.instalaciones).toFixed(2)
+    ]);
+    
+    const totalInstTec = arrTecnico.reduce((a, b) => a + b.instalaciones, 0);
+    const totalMontoTec = arrTecnico.reduce((a, b) => a + b.instalaciones * 9, 0);
+    
+    doc.autoTable({
+        head: [["CUADRILLA", "Instalaciones", "Monto ($)", "Soporte ($)"]],
+        body: tablaTecnico,
+        startY: yPos,
+        styles: { halign: "center", valign: "middle", fontSize: 9 },
+        headStyles: { fillColor: [102, 126, 234] },
+        didDrawPage: function(data) {
+            agregarPieDePagina(doc, pageNumber);
+            if (data.pageNumber > pageNumber) pageNumber = data.pageNumber;
+        }
+    });
+
+    yPos = doc.lastAutoTable.finalY + 8;
+    doc.setFontSize(10);
+    doc.text(`Total Instalaciones: ${totalInstTec}`, 14, yPos);
+    doc.text(`Monto Total: $${totalMontoTec.toFixed(2)}`, 14, yPos + 6);
+
+    yPos += 18;
+    doc.setFontSize(13);
+    doc.setTextColor(118, 75, 162);
+    doc.text("2. RESUMEN DE INFRAESTRUCTURA", 14, yPos);
+    doc.setTextColor(0, 0, 0);
+    yPos += 8;
+
+    const arrInfra = datos.infra;
+    const tablaInfra = arrInfra.map(d => [
+        d.cuadrilla,
+        d.nombre,
+        d.valor,
+        "$" + (d.valor * 10).toFixed(2)
+    ]);
+    
+    const totalValorInfra = arrInfra.reduce((a, b) => a + b.valor, 0);
+    const totalMontoInfra = arrInfra.reduce((a, b) => a + b.valor * 10, 0);
+    
+    doc.autoTable({
+        head: [["Cuadrilla", "Infraestructura", "Valor", "Monto ($)"]],
+        body: tablaInfra,
+        startY: yPos,
+        styles: { halign: "center", valign: "middle", fontSize: 9 },
+        headStyles: { fillColor: [118, 75, 162] },
+        columnStyles: { 0: { cellWidth: 50 } },
+        didDrawPage: function(data) {
+            agregarPieDePagina(doc, pageNumber);
+            if (data.pageNumber > pageNumber) pageNumber = data.pageNumber;
+        }
+    });
+
+    yPos = doc.lastAutoTable.finalY + 8;
+    doc.setFontSize(10);
+    doc.text(`Total Infraestructuras: ${totalValorInfra}`, 14, yPos);
+    doc.text(`Monto Total: $${totalMontoInfra.toFixed(2)}`, 14, yPos + 6);
+
+    yPos += 18;
+    
+    if (yPos > 240) {
+        doc.addPage();
+        pageNumber++;
+        yPos = 20;
+    }
+    
+    doc.setFontSize(13);
+    doc.setTextColor(102, 126, 234);
+    doc.text("3. RESUMEN TOTAL POR CUADRILLA", 14, yPos);
+    doc.setTextColor(0, 0, 0);
+    yPos += 8;
+
+    const resumenPorCuadrilla = {};
+    
+    arrTecnico.forEach(d => {
+        if (!resumenPorCuadrilla[d.nombre]) {
+            resumenPorCuadrilla[d.nombre] = {
+                instalaciones: 0,
+                montoInstalaciones: 0,
+                infraestructuras: 0,
+                montoInfraestructura: 0,
+                total: 0
+            };
+        }
+        resumenPorCuadrilla[d.nombre].instalaciones = d.instalaciones;
+        resumenPorCuadrilla[d.nombre].montoInstalaciones = d.instalaciones * 9;
+    });
+
+    arrInfra.forEach(d => {
+        if (!resumenPorCuadrilla[d.cuadrilla]) {
+            resumenPorCuadrilla[d.cuadrilla] = {
+                instalaciones: 0,
+                montoInstalaciones: 0,
+                infraestructuras: 0,
+                montoInfraestructura: 0,
+                total: 0
+            };
+        }
+        resumenPorCuadrilla[d.cuadrilla].infraestructuras += d.valor;
+        resumenPorCuadrilla[d.cuadrilla].montoInfraestructura += d.valor * 10;
+    });
+
+    const tablaResumen = [];
+    let totalGeneral = 0;
+
+    Object.keys(resumenPorCuadrilla).sort().forEach(cuadrilla => {
+        const info = resumenPorCuadrilla[cuadrilla];
+        const totalCuadrilla = info.montoInstalaciones + info.montoInfraestructura;
+        totalGeneral += totalCuadrilla;
+        
+        tablaResumen.push([
+            cuadrilla,
+            info.instalaciones,
+            "$" + info.montoInstalaciones.toFixed(2),
+            info.infraestructuras,
+            "$" + info.montoInfraestructura.toFixed(2),
+            "$" + totalCuadrilla.toFixed(2)
+        ]);
+    });
+
+    doc.autoTable({
+        head: [["Cuadrilla", "Instalaciones", "Monto Inst.", "Infraest.", "Monto Infra.", "Total Cuadrilla"]],
+        body: tablaResumen,
+        startY: yPos,
+        styles: { halign: "center", valign: "middle", fontSize: 9 },
+        headStyles: { fillColor: [102, 126, 234] },
+        footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+        foot: [["TOTAL GENERAL", "", "", "", "", "$" + totalGeneral.toFixed(2)]],
+        didDrawPage: function(data) {
+            agregarPieDePagina(doc, pageNumber);
+            if (data.pageNumber > pageNumber) pageNumber = data.pageNumber;
+        }
+    });
+
+    yPos = doc.lastAutoTable.finalY + 18;
+    
+    if (yPos > 240) {
+        doc.addPage();
+        pageNumber++;
+        yPos = 20;
+    }
+    
+    doc.setFontSize(13);
+    doc.setTextColor(220, 53, 69);
+    doc.text("4. TOTAL DE INSTALACIONES AUTORIZADAS POR SOPORTE", 14, yPos);
+    doc.setTextColor(0, 0, 0);
+    yPos += 8;
+
+    const totalInstalacionesAutorizadas = arrTecnico.reduce((a, b) => a + b.instalaciones, 0);
+    const totalSoporteAutorizado = arrTecnico.reduce((a, b) => a + b.instalaciones, 0);
+
+    const tablaSoporte = [[
+        "Total Instalaciones",
+        totalInstalacionesAutorizadas,
+        "$" + totalSoporteAutorizado.toFixed(2)
+    ]];
+
+    doc.autoTable({
+        head: [["Concepto", "Cantidad", "Monto Soporte ($)"]],
+        body: tablaSoporte,
+        startY: yPos,
+        styles: { halign: "center", valign: "middle", fontSize: 10, fillColor: [255, 245, 245] },
+        headStyles: { fillColor: [220, 53, 69] },
+        columnStyles: {
+            0: { halign: 'left', fontStyle: 'bold' },
+            1: { halign: 'center' },
+            2: { halign: 'center', fontStyle: 'bold' }
+        },
+        didDrawPage: function(data) {
+            agregarPieDePagina(doc, pageNumber);
+            if (data.pageNumber > pageNumber) pageNumber = data.pageNumber;
+        }
+    });
+
+    doc.save(`Reporte_${empresa.replace(/\s+/g, '_')}_${mesSeleccionado}_${anioSeleccionado}.pdf`);
+}
+</script>
+</body>
+</html>
